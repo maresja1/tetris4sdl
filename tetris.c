@@ -211,6 +211,8 @@ PLAYER *PLAYER_create()
  */
 void PLAYER_destroy(PLAYER *player)
 {
+	free(player->piece);
+	free(player->next);
 	free(player->board);
 	free(player->old_board);
 	free(player);
@@ -410,10 +412,11 @@ int PLAYER_putpiece(PLAYER *player, PIECE *piece)
 	if (j==0) {
 		memcpy(player->board, tmp, board_width*board_height);
 		player->draw_board = TRUE;
+		free(tmp);
 		return TRUE;
 	}
+
 	free(tmp);
-		
 	return FALSE;	
 }
 
@@ -425,8 +428,8 @@ int PLAYER_putpiece(PLAYER *player, PIECE *piece)
  */
 int PLAYER_movepiece(PLAYER *player, int direction)
 {
-	PIECE *tmp = PIECE_create();
-	
+	PIECE *tmp;
+
 	if (direction == BOTTOM) {
 		while (((tmp = PIECE_move(player->piece, DOWN)) != NULL) && (PLAYER_putpiece(player, tmp) == TRUE)) {
 			player->score.points++;
@@ -434,6 +437,10 @@ int PLAYER_movepiece(PLAYER *player, int direction)
 			player->draw_board = TRUE;
 			player->draw_score = TRUE;
 			PLAYER_draw(player);
+			PIECE_destroy(tmp);
+		}
+		if(tmp != NULL){
+			PIECE_destroy(tmp);
 		}
 		return TRUE;
 	}
@@ -444,6 +451,7 @@ int PLAYER_movepiece(PLAYER *player, int direction)
 				player->score.points++;
 				player->draw_score = TRUE;
 			}
+		PIECE_destroy(tmp);
 	}
 	else {
 		if ((direction == DOWN) || (direction == DROP)) {
@@ -674,6 +682,7 @@ PIECE *PIECE_move(PIECE *piece, int direction)
 	memcpy(tmp, piece, sizeof(PIECE));
 			
 	int j;
+	int invalid_move = FALSE;
 	switch (direction)
 	{
 		case DOWN:
@@ -681,23 +690,30 @@ PIECE *PIECE_move(PIECE *piece, int direction)
 			if (PIECE_getmaxy(tmp) < board_height-1) {
 	 			for (j=0; j<4; j++) tmp->mask[j].y++;
 				tmp->y++;
+			} else {
+				invalid_move = TRUE;
 			}
-			else return NULL;
 			break;
 		case LEFT:
 			if (PIECE_getminx(tmp) > 0) {
 				for (j=0; j<4; j++) tmp->mask[j].x--;
 				tmp->x--;
+			} else {
+				invalid_move = TRUE;
 			}
-			else return NULL;
 			break;
 		case RIGHT: 
 			if (PIECE_getmaxx(tmp) < board_width-1) {
 				for (j=0; j<4; j++) tmp->mask[j].x++;
 				tmp->x++;
+			} else {
+				invalid_move = TRUE;
 			}
-			else return NULL;
 			break;
+	}
+	if(invalid_move){
+		free(tmp);
+		return NULL;
 	}
 	return tmp;	
 		

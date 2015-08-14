@@ -27,8 +27,8 @@ extern SDL_Surface *screen;
  *   	FONT *FONT_Create(char *filename, int size, int style)
  *	
  *	Crea un nuevo FONT TrueType. Los datos se leen del archivo 
- *	enviado como parámetro. El tamaño y el estilo también se 
- *	mandan como parámetro. 
+ *	enviado como parï¿½metro. El tamaï¿½o y el estilo tambiï¿½n se 
+ *	mandan como parï¿½metro. 
  *	
  *	NO es necesario reservar memoria con malloc o similares.
  *	IMPORTANTE: DEBE estar inicializado el soporte para fonts TTF.
@@ -70,9 +70,9 @@ void FONT_setcolor(FONT *font, int color, int shadow)
  *	void FONT_writexy(FONT *font, char *string, int x, int y, 
  *				int color, int shadow, int update_screen)
  *
- *	Escribe en la posición (x,y) la cadena enviada como parámetro. 
- *	El número de color (8 bits) es enviado como parámetro y se lee 
- *	la paleta activa. Si update es TRUE, no será necesario 
+ *	Escribe en la posiciï¿½n (x,y) la cadena enviada como parï¿½metro. 
+ *	El nï¿½mero de color (8 bits) es enviado como parï¿½metro y se lee 
+ *	la paleta activa. Si update es TRUE, no serï¿½ necesario 
  *	actualizar la pantalla.
  */
 void FONT_writexy(FONT *font, char *string, int x, int y, int update_screen)
@@ -88,6 +88,8 @@ void FONT_writexy(FONT *font, char *string, int x, int y, int update_screen)
 	dest.w = buffer->w;
 	dest.h = buffer->h;
 	SDL_BlitSurface(buffer, NULL, screen, &dest);
+	SDL_FreeSurface(buffer);
+
 	
 	buffer = TTF_RenderText_Blended(font->ttf_font, string, screen->format->palette->colors[font->fcolor]);
 
@@ -95,6 +97,7 @@ void FONT_writexy(FONT *font, char *string, int x, int y, int update_screen)
 	dest.y = y;
 
 	SDL_BlitSurface(buffer, NULL, screen, &dest);
+	SDL_FreeSurface(buffer);
 	if (update_screen == TRUE) SDL_UpdateRect(screen, dest.x, dest.y, dest.w, dest.h);
 
 	return;
@@ -105,8 +108,8 @@ void FONT_writexy(FONT *font, char *string, int x, int y, int update_screen)
  *	void FONT_center(FONT *font, char *string, 
  *				SDL_Rect *rectangle, int update_screen)
  *
- *	Escribe el string CENTRADO en el rectángulo 
- *	enviado como parámetro. 
+ *	Escribe el string CENTRADO en el rectï¿½ngulo 
+ *	enviado como parï¿½metro. 
  */
 void FONT_center(FONT *font, char *string, SDL_Rect *rectangle, int update_screen)
 {
@@ -120,6 +123,7 @@ void FONT_center(FONT *font, char *string, SDL_Rect *rectangle, int update_scree
 	dest.w = buffer->w;
 	dest.h = buffer->h;
 	SDL_BlitSurface(buffer, NULL, screen, &dest);
+	SDL_FreeSurface(buffer);
 	
 	buffer = TTF_RenderText_Blended(font->ttf_font, string, screen->format->palette->colors[font->fcolor]);
 
@@ -127,6 +131,7 @@ void FONT_center(FONT *font, char *string, SDL_Rect *rectangle, int update_scree
 	dest.y = rectangle->y + (rectangle->h - buffer->h)/2 - 2;
 	
 	SDL_BlitSurface(buffer, NULL, screen, &dest);
+	SDL_FreeSurface(buffer);
 	if (update_screen == TRUE) SDL_UpdateRect(screen, dest.x, dest.y, dest.w, dest.h);
 
 }
@@ -134,8 +139,8 @@ void FONT_center(FONT *font, char *string, SDL_Rect *rectangle, int update_scree
 /*
  * 	void FONT_right(FONT *font, char *string, SDL_Rect *rectangle, int update_screen)
  *
- * 	Escribe ALINEANDO a derecha el texto dentro del rectángulo
- * 	enviado como parámetro.
+ * 	Escribe ALINEANDO a derecha el texto dentro del rectï¿½ngulo
+ * 	enviado como parï¿½metro.
  */
 void FONT_right(FONT *font, char *string, SDL_Rect *rectangle, int update_screen)
 {
@@ -149,6 +154,7 @@ void FONT_right(FONT *font, char *string, SDL_Rect *rectangle, int update_screen
 	dest.w = buffer->w;
 	dest.h = buffer->h;
 	SDL_BlitSurface(buffer, NULL, screen, &dest);
+	SDL_FreeSurface(buffer);
 	
 	buffer = TTF_RenderText_Blended(font->ttf_font, string, screen->format->palette->colors[font->fcolor]);
 
@@ -156,6 +162,7 @@ void FONT_right(FONT *font, char *string, SDL_Rect *rectangle, int update_screen
 	dest.y = rectangle->y + (rectangle->h - buffer->h)/2-2;
 	
 	SDL_BlitSurface(buffer, NULL, screen, &dest);
+	SDL_FreeSurface(buffer);
 	if (update_screen == TRUE) SDL_UpdateRect(screen, dest.x, dest.y, dest.w, dest.h);
 
 }
@@ -164,7 +171,7 @@ void FONT_right(FONT *font, char *string, SDL_Rect *rectangle, int update_screen
  * 	void FONT_input(FONT *font, char *string, int x, int y, int w)
  *
  * 	Espera la entrada de un string de longitud n 
- * 	en la posición (x,y).
+ * 	en la posiciï¿½n (x,y).
  * 	TODO: mostrar cursor
  * 	TODO: guardar imagen de fondo y escribir sobre eso
  */
@@ -213,7 +220,7 @@ void FONT_inputxy(FONT *font, char *string, int x, int y, int w)
 				case SDLK_RETURN:
     					str[strlen(str)]='\0';
 					strcpy(string, str);
-					printf("ingresó: %s\n", str);
+					printf("ingresï¿½: %s\n", str);
 					done = TRUE;
 					break;
 				default:
