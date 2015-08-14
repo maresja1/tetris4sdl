@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <string.h>
 #include "tetris.h"
 
 /***************************************************************************
@@ -199,7 +200,10 @@ PLAYER *PLAYER_create()
 
 	player->board = (char *)malloc(board_height*board_width);
 	player->old_board = (char *)malloc(board_height*board_width);
-	
+
+	player->piece = PIECE_create();
+	player->next = PIECE_create();
+
 	PLAYER_init(player);
 	return player;
 }
@@ -262,8 +266,6 @@ void PLAYER_init(PLAYER *player)
 
 	/* Creo y elijo una FICHA para empezar el juego 
 	 * y la FICHA siguiente */
-	player->piece = PIECE_create();
-	player->next = PIECE_create();
 	PIECE_set(player->piece, BLOCK_random());
 	PIECE_set(player->next, BLOCK_random());
 }
@@ -444,73 +446,77 @@ int PLAYER_movepiece(PLAYER *player, int direction)
 		}
 		return TRUE;
 	}
-	
-	if (((tmp = PIECE_move(player->piece, direction)) != NULL) && (PLAYER_putpiece(player, tmp) == TRUE)) {
+
+	tmp = PIECE_move(player->piece, direction);
+	if (tmp != NULL) {
+		if(PLAYER_putpiece(player, tmp) == TRUE) {
 			memcpy(player->piece, tmp, sizeof(PIECE));
-			if (direction == DOWN) { 
+			if (direction == DOWN) {
 				player->score.points++;
 				player->draw_score = TRUE;
 			}
+			PIECE_destroy(tmp);
+			return  TRUE;
+		}
 		PIECE_destroy(tmp);
 	}
-	else {
-		if ((direction == DOWN) || (direction == DROP)) {
 
-			/* Nueva ficha */
-			memcpy(player->old_board, player->board, board_width*board_height);
-			PLAYER_check(player);
-			player->draw_next = TRUE;
-			player->draw_board = TRUE;
-			memcpy(player->piece, player->next, sizeof(PIECE));
-			PIECE_set(player->next, BLOCK_random());
+	if ((direction == DOWN) || (direction == DROP)) {
 
-			/* �Se perdi� el partido? 
-			 * En ese caso, adem�s de lo obvio, hacer un efecto simpatic�n 
-			 * en el tablero y ocultar la que era la ficha siguiente */
-			if (PLAYER_putpiece(player, player->piece) == FALSE) {
-				
-				/* ...para la ficha siguiente */
-				int x,y,i,j,k=BLOCK_random();
-				SDL_Rect dest;
-				memcpy(&dest, &next_rectangle, sizeof(SDL_Rect));
-				for (j=0; j<4; j++) {
-					for (i=0; i<4; i++) {
-						x = 10+dest.x + block_width*i;
-						y = 10+dest.y + block_height*j;
-						BLOCK_draw(k, x, y);
-					}
-				}	
-				SDL_UpdateRect(screen, dest.x, dest.y, dest.w, dest.h);
-				player->draw_next = FALSE;
-		
-				/* ...para el tablero */
-				for (k=0; k<board_height; k++) {
-					memset(player->board+k*board_width, 1+(k%7), board_width);
-					player->draw_board = TRUE;
-					PLAYER_draw(player);
-					SDL_Delay(50);
+		/* Nueva ficha */
+		memcpy(player->old_board, player->board, board_width*board_height);
+		PLAYER_check(player);
+		player->draw_next = TRUE;
+		player->draw_board = TRUE;
+		memcpy(player->piece, player->next, sizeof(PIECE));
+		PIECE_set(player->next, BLOCK_random());
+
+		/* �Se perdi� el partido?
+		 * En ese caso, adem�s de lo obvio, hacer un efecto simpatic�n
+		 * en el tablero y ocultar la que era la ficha siguiente */
+		if (PLAYER_putpiece(player, player->piece) == FALSE) {
+
+			/* ...para la ficha siguiente */
+			int x,y,i,j,k=BLOCK_random();
+			SDL_Rect dest;
+			memcpy(&dest, &next_rectangle, sizeof(SDL_Rect));
+			for (j=0; j<4; j++) {
+				for (i=0; i<4; i++) {
+					x = 10+dest.x + block_width*i;
+					y = 10+dest.y + block_height*j;
+					BLOCK_draw(k, x, y);
 				}
-				
-				PLAYER_setmessage(player, "Game over");
-				PLAYER_draw(player);
-
-				/* Para el highscore 
-				 * FIXME: falta corregir la funci�n input */
-				
-				//char name[20];
-				//name[0] = '\0';
-				//FONT_inputxy(font, name, 50, 50, 20);
-				
-				/* Algunas consideraciones generales */
-				HIGHSCORE_put(highscore, &player->score, player->rank);
-				HIGHSCORE_save(highscore, "highscores");
-				player->draw_board = FALSE;
-				player->gameover = TRUE;
-				return FALSE;
-		
 			}
-			
+			SDL_UpdateRect(screen, dest.x, dest.y, dest.w, dest.h);
+			player->draw_next = FALSE;
+
+			/* ...para el tablero */
+			for (k=0; k<board_height; k++) {
+				memset(player->board+k*board_width, 1+(k%7), board_width);
+				player->draw_board = TRUE;
+				PLAYER_draw(player);
+				SDL_Delay(50);
+			}
+
+			PLAYER_setmessage(player, "Game over");
+			PLAYER_draw(player);
+
+			/* Para el highscore
+			 * FIXME: falta corregir la funci�n input */
+
+			//char name[20];
+			//name[0] = '\0';
+			//FONT_inputxy(font, name, 50, 50, 20);
+
+			/* Algunas consideraciones generales */
+			HIGHSCORE_put(highscore, &player->score, player->rank);
+			HIGHSCORE_save(highscore, "highscores");
+			player->draw_board = FALSE;
+			player->gameover = TRUE;
+			return FALSE;
+
 		}
+
 	}
 	return TRUE;
 }
