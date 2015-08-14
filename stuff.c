@@ -26,12 +26,12 @@ extern SDL_Surface *screen;		/* Puntero a memoria de video */
 /*
  * 	void GFX_init()
  *
- * 	Inicializa SDL 800x600x8.
+ * 	Initializing SDL 800x600x8.
  */
 void GFX_init()
 {
 
-	printf("Inicializando SDL...\n");
+	printf("Initializing SDL...\n");
 	if (SDL_Init(SDL_INIT_VIDEO) < 0 ) {
 		printf("ERROR: %s\n",SDL_GetError());
 		SDL_Quit();
@@ -63,7 +63,7 @@ void GFX_quit()
 /*
  *	void showbmp(char *filename)
  * 
- * 	Carga el BMP enviado como parámetro, lo pone en pantalla 
+ * 	Carga el BMP enviado como parï¿½metro, lo pone en pantalla 
  * 	y carga su paleta de colores. 
  */
 void showbmp(char *filename)
@@ -78,8 +78,8 @@ void showbmp(char *filename)
 
 	if (bmp->format->palette && screen->format->palette) {
 		SDL_SetColors(screen, bmp->format->palette->colors, 0,bmp->format->palette->ncolors);
-	    	printf("%d colores\n", bmp->format->palette->ncolors);
-	    	printf("%d colores (screen)\n", screen->format->palette->ncolors);
+	    	printf("%d colors\n", bmp->format->palette->ncolors);
+	    	printf("%d colors (screen)\n", screen->format->palette->ncolors);
  	}
 	
   	if (SDL_BlitSurface(bmp, NULL, screen, NULL) < 0) {

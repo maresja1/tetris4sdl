@@ -109,7 +109,7 @@ void TETRIS_run()
  *
  * 	Manejador de eventos. Utilizado en TETRIS_run().
  * 	Si la ventana deja de ser activa juego se pone 
- * 	automáticamente en pausa. 
+ * 	automï¿½ticamente en pausa. 
  */
 void TETRIS_eventhandler()
 {
@@ -185,7 +185,7 @@ void TETRIS_eventhandler()
 /*
  *   	PLAYER *player_create()
  *   	
- *   	Crea un nuevo jugador de TETRIS. Esta función devuelve un puntero 
+ *   	Crea un nuevo jugador de TETRIS. Esta funciï¿½n devuelve un puntero 
  *   	a la estructura del PLAYER (lista para usar) o NULL en caso de 
  *   	haberse encontrado un error. 
  *   	
@@ -197,8 +197,8 @@ PLAYER *PLAYER_create()
 	PLAYER *player = (PLAYER *)malloc(sizeof(PLAYER));
 	if (player == NULL) return NULL;
 
-	player->board = (char *)calloc(board_height, board_width);
-	player->old_board = (char *)calloc(board_height, board_width);
+	player->board = (char *)calloc(0, board_height*board_width);
+	player->old_board = (char *)calloc(0, board_height*board_width);
 	
 	PLAYER_init(player);
 	return player;
@@ -219,15 +219,11 @@ void PLAYER_destroy(PLAYER *player)
 /*
  * 	void PLAYER_init(PLAYER *player)
  *
- * 	Inicializa la estructura para el JUGADOR. Esta función 
+ * 	Inicializa la estructura para el JUGADOR. Esta funciï¿½n 
  * 	es utilizada para empezar un nuevo partido de TETRIS.
  */
 void PLAYER_init(PLAYER *player)
 {
-
-	memset(player->board, 0, board_height*board_width);
-	memset(player->old_board, 0, board_height*board_width);
-	
 	player->score.points = 0;
 	player->score.level = 1;
 	player->score.lines = 0;
@@ -236,9 +232,9 @@ void PLAYER_init(PLAYER *player)
 
 	strcpy(player->message, "Ok, let's play...");
 	
-	/* Por default, el JUGADOR no está rankeado
+	/* Por default, el JUGADOR no estï¿½ rankeado
 	 * NOT_RANKED es -1. Al darle el valor -2 es seguro que
-	 * siempre va a escribirse la posición del JUGADOR */
+	 * siempre va a escribirse la posiciï¿½n del JUGADOR */
 	player->rank = highscore->length+1;		
 	
 	player->draw_next = TRUE;
@@ -301,7 +297,7 @@ void PLAYER_draw(PLAYER *player)
 		player->draw_board = FALSE;
 	}
 
-	/* Chequear si hubo un ascenso en la posición del highscore
+	/* Chequear si hubo un ascenso en la posiciï¿½n del highscore
 	 * y en ese caso, escribir el lugar en pantalla */
 	int rank = HIGHSCORE_where(highscore, &player->score);
 	if (rank < player->rank) {
@@ -331,8 +327,8 @@ void PLAYER_draw(PLAYER *player)
 		FONT_right(font, string, &dest, FALSE);
 		SDL_UpdateRect(screen, dest.x, dest.y, dest.w, dest.h);
 
-		/* Nivel y líneas 
-		 * FIXME: ¿Utilizar una función?*/
+		/* Nivel y lï¿½neas 
+		 * FIXME: ï¿½Utilizar una funciï¿½n?*/
 		memcpy(&dest, &lines_rectangle, sizeof(SDL_Rect));
 		SDL_FillRect(screen, &dest, 0);
 		sprintf(string, "%3d", player->score.lines);
@@ -418,8 +414,8 @@ int PLAYER_putpiece(PLAYER *player, PIECE *piece)
 
 /*	int PLAYER_movepiece(PLAYER *player, int direction)
  *
- *	Mueve la FICHA activa en la dirección indicada 
- *	como parámetro. Devuelve el estado del juego después de
+ *	Mueve la FICHA activa en la direcciï¿½n indicada 
+ *	como parï¿½metro. Devuelve el estado del juego despuï¿½s de
  *	la movida.
  */
 int PLAYER_movepiece(PLAYER *player, int direction)
@@ -455,8 +451,8 @@ int PLAYER_movepiece(PLAYER *player, int direction)
 			memcpy(player->piece, player->next, sizeof(PIECE));
 			PIECE_set(player->next, BLOCK_random());
 
-			/* ¿Se perdió el partido? 
-			 * En ese caso, además de lo obvio, hacer un efecto simpaticón 
+			/* ï¿½Se perdiï¿½ el partido? 
+			 * En ese caso, ademï¿½s de lo obvio, hacer un efecto simpaticï¿½n 
 			 * en el tablero y ocultar la que era la ficha siguiente */
 			if (PLAYER_putpiece(player, player->piece) == FALSE) {
 				
@@ -486,7 +482,7 @@ int PLAYER_movepiece(PLAYER *player, int direction)
 				PLAYER_draw(player);
 
 				/* Para el highscore 
-				 * FIXME: falta corregir la función input */
+				 * FIXME: falta corregir la funciï¿½n input */
 				
 				//char name[20];
 				//name[0] = '\0';
@@ -522,13 +518,13 @@ void PLAYER_check(PLAYER *player)
 		for (i=0; i<board_width; i++) k *= player->old_board[j*board_width+i];
 		if (k != 0) {
 		
-			/* Primero, se hace un efecto simpaticón */
+			/* Primero, se hace un efecto simpaticï¿½n */
 			memset(player->board+j*board_width, 8, board_width);
 			player->draw_board = TRUE;
 			PLAYER_draw(player);
 			SDL_Delay(50);
 			
-			/* Ahora sí se quitan las líneas */
+			/* Ahora sï¿½ se quitan las lï¿½neas */
 			for (k=j; k>0; k--) 
 				memcpy(player->old_board+k*board_width, player->old_board+board_width*(k-1), board_width);
 			
@@ -539,8 +535,8 @@ void PLAYER_check(PLAYER *player)
 			player->draw_board = TRUE;
 			player->lastdrop = SDL_GetTicks();
 		
-			/* Cada 10 líneas se avanza un nivel. 
-			 * El mínimo drop_delay posible es 12. */ 
+			/* Cada 10 lï¿½neas se avanza un nivel. 
+			 * El mï¿½nimo drop_delay posible es 12. */ 
 			if (player->score.lines > player->score.level * 10) {
 				player->score.level++;
 				PLAYER_setmessage(player, "Level up!");
@@ -634,10 +630,10 @@ void PIECE_set(PIECE *piece, int number)
 /*
  * 	void PIECE_rotate(PIECE *piece, int direction)
  *
- * 	Rota la FICHA hacia la izquierda. Esta función no es para ubicar
- * 	la ficha en el tablero. Solamente calcula la máscara de la ficha
+ * 	Rota la FICHA hacia la izquierda. Esta funciï¿½n no es para ubicar
+ * 	la ficha en el tablero. Solamente calcula la mï¿½scara de la ficha
  * 	rotada. 
- * 	FIXME: ¿direction?
+ * 	FIXME: ï¿½direction?
  */
 PIECE* PIECE_rotate(PIECE *piece, int direction)
 {
@@ -662,9 +658,9 @@ PIECE* PIECE_rotate(PIECE *piece, int direction)
 /*	PIECE *PIECE_move(PIECE *piece, int direction)
  *
  *	Devuelve la FICHA ontenida al mover la FICHA ingresada 
- *	como parámetro en la dirección especificada.
- *	Esta función no ubica la ficha en el tablero. Solamente 
- *	calcula la nueva máscara. 
+ *	como parï¿½metro en la direcciï¿½n especificada.
+ *	Esta funciï¿½n no ubica la ficha en el tablero. Solamente 
+ *	calcula la nueva mï¿½scara. 
  */
 PIECE *PIECE_move(PIECE *piece, int direction)
 {
@@ -705,8 +701,8 @@ PIECE *PIECE_move(PIECE *piece, int direction)
 /*
  * 	void PIECE_getmask(PIECE *piece)
  *
- * 	Extrae la ubicación de los puntos de cada ladrillo en base
- * 	a la pieza y a su rotación.
+ * 	Extrae la ubicaciï¿½n de los puntos de cada ladrillo en base
+ * 	a la pieza y a su rotaciï¿½n.
  */
 void PIECE_getmask(PIECE *piece)
 {
@@ -733,8 +729,8 @@ void PIECE_getmask(PIECE *piece)
  * 	int PIECE_getmaxy(PIECE *piece)
  * 	int PIECE_getminy(PIECE *piece)
  *
- * 	Devuelven los extremos de la máscara de la ficha.
- * 	Es necesario TENER la máscara cargada en la estructura.
+ * 	Devuelven los extremos de la mï¿½scara de la ficha.
+ * 	Es necesario TENER la mï¿½scara cargada en la estructura.
  */
 int PIECE_getmaxx(PIECE *piece) 
 { 
@@ -761,11 +757,11 @@ int PIECE_getminy(PIECE *piece)
 /*
  * 	void BLOCK_draw(int number, int x, int y)
  *
- * 	Dibuja el ladrillo number en la posición (x,y) de la pantalla. 
- * 	Los ladrillos están en el archivo "blocks.bmp". Los primeros 
+ * 	Dibuja el ladrillo number en la posiciï¿½n (x,y) de la pantalla. 
+ * 	Los ladrillos estï¿½n en el archivo "blocks.bmp". Los primeros 
  * 	7 ladrillos son de color (rojo, rosa, azul, celeste, verde,
  * 	amarillo y beige). Los 7 restantes son grises.
- * 	Esta función necesita ser seguida de un UPDATE.
+ * 	Esta funciï¿½n necesita ser seguida de un UPDATE.
  *
  */
 void BLOCK_draw(int number, int x, int y)
@@ -790,7 +786,7 @@ void BLOCK_draw(int number, int x, int y)
 /*
  * 	int BLOCK_random()
  *
- * 	Devuelve un número entre 1 y 7
+ * 	Devuelve un nï¿½mero entre 1 y 7
  */
 int BLOCK_random()
 {
