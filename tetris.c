@@ -197,8 +197,8 @@ PLAYER *PLAYER_create()
 	PLAYER *player = (PLAYER *)malloc(sizeof(PLAYER));
 	if (player == NULL) return NULL;
 
-	player->board = (char *)calloc(0, board_height*board_width);
-	player->old_board = (char *)calloc(0, board_height*board_width);
+	player->board = (char *)malloc(board_height*board_width);
+	player->old_board = (char *)malloc(board_height*board_width);
 	
 	PLAYER_init(player);
 	return player;
@@ -224,6 +224,9 @@ void PLAYER_destroy(PLAYER *player)
  */
 void PLAYER_init(PLAYER *player)
 {
+	memset(player->board, 0, board_height*board_width);
+	memset(player->old_board, 0, board_height*board_width);
+
 	player->score.points = 0;
 	player->score.level = 1;
 	player->score.lines = 0;
@@ -248,6 +251,7 @@ void PLAYER_init(PLAYER *player)
 	player->paused = FALSE;
 	player->running = TRUE;
 	player->gameover = FALSE;
+	player->moving = FALSE;
 	player->x = board_rectangle.x;
 	player->y = board_rectangle.y;
 	
@@ -390,7 +394,7 @@ void PLAYER_draw(PLAYER *player)
 int PLAYER_putpiece(PLAYER *player, PIECE *piece)
 {
 
-	char *tmp = (char *)calloc(board_height, board_width);
+	char *tmp = (char *)malloc(board_height*board_width);
 	memcpy(tmp, player->old_board, board_width*board_height);
 
 	/* Ubico la ficha en el tablero temporal y verifico */
@@ -408,6 +412,7 @@ int PLAYER_putpiece(PLAYER *player, PIECE *piece)
 		player->draw_board = TRUE;
 		return TRUE;
 	}
+	free(tmp);
 		
 	return FALSE;	
 }
@@ -444,7 +449,7 @@ int PLAYER_movepiece(PLAYER *player, int direction)
 		if ((direction == DOWN) || (direction == DROP)) {
 
 			/* Nueva ficha */
-			memcpy(player->old_board, player->board, block_width*block_height);
+			memcpy(player->old_board, player->board, board_width*board_height);
 			PLAYER_check(player);
 			player->draw_next = TRUE;
 			player->draw_board = TRUE;
